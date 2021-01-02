@@ -1,0 +1,16 @@
+from selenium import webdriver
+from bs4 import BeautifulSoup
+
+search_name = input("검색할 내용: ")
+search_num = int(input("원하는 갯수: "))
+
+browser = webdriver.Chrome()
+
+url = "https://www.google.com/search?q=" + str(search_name) + "&hl=ko&tbm=isch"
+browser.get(url)
+
+for i in range(search_num):
+    img = browser.find_elements_by_tag_name("img")[i]
+    img.screenshot(str(i) + ".jpg")
+
+browser.close()

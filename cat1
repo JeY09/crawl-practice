@@ -1,0 +1,52 @@
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+import urllib.request
+
+search_name = input("검색할 내용: ")
+search_num = int(input("원하는 갯수: "))
+
+browser = webdriver.Chrome()
+browser.get("https://www.google.co.kr/imghp?hl=ko&tab=wi&authuser=0&ogbl")
+elem = browser.find_element_by_name("q")
+elem.send_keys(str(search_name))
+elem.send_keys(Keys.RETURN)
+
+SCROLL_PAUSE_TIME = 1
+
+last_height = browser.execute_script("return document.body.scrollHeight")
+while True:
+    
+    browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    
+    time.sleep(SCROLL_PAUSE_TIME)
+    
+    new_height = browser.execute_script("return document.body.scrollHeight")
+    if new_height == last_height:
+        try:
+            browser.find_element_by_css_selector(".mye4qd").click()
+        except:
+            break
+    last_height = new_height
+
+images = browser.find_elements_by_css_selector(".rg_i.Q4LuWd")
+count = 1
+for image in images:
+    try:
+        image.click()
+
+        time.sleep(2)
+
+        imgUrl = browser.find_element_by_xpath("/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div/div/div[3]/div[2]/c-wiz/div[1]/div[1]/div/div[2]/a/img").get_attribute("src")
+        opener=urllib.request.build_opener()
+        opener.addheaders=[("User-Agent","Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.183 Safari/537.36 RuxitSynthetic/1.0 v8001873298 t38550 ath9b965f92 altpub cvcv=2")]
+        
+        urllib.request.install_opener(opener)
+        urllib.request.urlretrieve(imgUrl, str(count) + ".jpg")
+        count = count + 1
+    except:
+        pass
+    if count >= search_num:
+        break
+
+browser.quit()
